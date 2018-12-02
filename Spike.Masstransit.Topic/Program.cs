@@ -25,6 +25,14 @@
                     h.Username(User);
                     h.Password(Password);
                 });
+
+                cfg.Send<IEvent>(x =>
+                {
+                    x.UseRoutingKeyFormatter(context => "spike.routingKey");
+                });
+
+                cfg.Message<IEvent>(x => x.SetEntityName("spike.exchange"));
+                cfg.Publish<IEvent>(x => x.ExchangeType = ExchangeType.Direct);
             });
 
             busControl.Start();
@@ -53,16 +61,19 @@
         private static void Subscribe(IComponentContext context, string key)
         {
             var queueName = $"spike-{key}-queue";
-            var handle = host.ConnectReceiveEndpoint(queueName, e =>
+            //var handle = host.ConnectReceiveEndpoint(queueName, e =>
+            var handle = host.ConnectReceiveEndpoint("spike.queue", e =>
             {
                 e.BindMessageExchanges = false;
                 e.Consumer<GenericConsumer>(context);
-                e.Bind(ExchangeName, x =>
+                //e.Bind(ExchangeName, x =>
+                e.Bind("spike.exchange", x =>
                 {
                     x.ExchangeType = ExchangeType.Direct;
                     x.Durable = true;
+                    x.RoutingKey = "spike.routingKey";
                 });
-                e.Bind<IEvent>();
+               // e.Bind<IEvent>();
             });
 
             handle.Ready.ConfigureAwait(false).GetAwaiter().GetResult();

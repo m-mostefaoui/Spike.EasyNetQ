@@ -1,11 +1,10 @@
-﻿using System;
-
-namespace EasyNetQManagement
+﻿namespace EasyNetQManagement
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using EasyNetQ.Management.Client;
     using EasyNetQ.Management.Client.Model;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     class Program
     {
@@ -19,23 +18,29 @@ namespace EasyNetQManagement
 
         private static async Task Main(string[] args)
         {
-            string exchangeName = "spike.exchange";
             string queueName = "spike.queue";
-            string routingKey = "spike.routingKey";
+            
+            using (managementClient = new ManagementClient(HostName, Username, Password))
+            {
+                vhost = await managementClient.GetVhostAsync(VirtualHost);
 
-            managementClient = new ManagementClient(HostName, Username, Password);
-            vhost = await managementClient.GetVhostAsync(VirtualHost);
+                var queue = await CreateQueue(queueName);
 
-            var exchange = await EnsureExchangeExists(exchangeName);
-            var queue = await EnsureQueueExists(queueName);
-            await EnsureBindingExists(exchange, queue, routingKey);
+                var exchanges = await managementClient.GetExchangesAsync();
+                var enumerable = exchanges.Where(x => x.Name.EndsWith("ServiceRatesImportFileParsed", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                foreach (var ex in enumerable)
+                {
+                    Console.WriteLine($"Exchange {ex.Name}");
+                    var exchange = await CreateExchange(ex.Name);
+                    await CreateBinding(exchange, queue);
+                }
+            }
 
             Console.WriteLine("-- end --");
-            //var bindings = await managementClient.GetBindingsWithSourceAsync(exchange);
-            //var bindings = managementClient.GetBindingsWithDestinationAsync(exchange);
         }
 
-        private static async Task<Exchange> EnsureExchangeExists(string exchangeName)
+        private static async Task<Exchange> CreateExchange(string exchangeName)
         {
             var (found, foundExchange) = await GetExchange(exchangeName);
             if (!found)
@@ -65,7 +70,7 @@ namespace EasyNetQManagement
             return (exchange != null, exchange);
         }
 
-        private static async Task<Queue> EnsureQueueExists(string queueName)
+        private static async Task<Queue> CreateQueue(string queueName)
         {
             var (found, foundQueue) = await GetQueue(queueName);
             if (!found)
@@ -84,7 +89,7 @@ namespace EasyNetQManagement
             {
                 queue = await managementClient.GetQueueAsync(queueName, vhost);
             }
-            catch (UnexpectedHttpStatusCodeException)
+            catch (Exception)
             {
                 // Log it
             }
@@ -92,15 +97,15 @@ namespace EasyNetQManagement
             return (queue != null, queue);
         }
 
-        private static async Task EnsureBindingExists(Exchange exchange, Queue queue, string routingKey)
+        private static async Task CreateBinding(Exchange exchange, Queue queue)
         {
             var bindings = await managementClient.GetBindingsAsync(exchange, queue);
-            var binding = bindings.SingleOrDefault(b => b.RoutingKey.Equals(routingKey, StringComparison.OrdinalIgnoreCase));
+            //var binding = bindings.SingleOrDefault(b => b.RoutingKey.Equals(routingKey, StringComparison.OrdinalIgnoreCase));
 
-            if (binding == null)
-            {
-                await managementClient.CreateBinding(exchange, queue, new BindingInfo(routingKey));
-            }
+           // if (binding == null)
+           // {
+                await managementClient.CreateBinding(exchange, queue, new BindingInfo(""));
+            //}
         }
     }
 }

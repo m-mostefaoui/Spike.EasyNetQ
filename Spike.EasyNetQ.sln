@@ -5,19 +5,17 @@ VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messages", "Messages\Messages.csproj", "{923FD525-1BE4-4466-9566-DD6AE198956B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publisher", "Publisher\Publisher.csproj", "{1B5D61D1-65D6-415E-AC55-C65F5DD27BF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publisher", "Publisher\Publisher.csproj", "{1B5D61D1-65D6-415E-AC55-C65F5DD27BF2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Subscriber", "Subscriber\Subscriber.csproj", "{9015F35D-5881-40D9-8785-1F05A5A070A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscriber", "Subscriber\Subscriber.csproj", "{9015F35D-5881-40D9-8785-1F05A5A070A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spike.Masstransit", "Spike.Masstransit\Spike.Masstransit.csproj", "{24FE7925-DF39-4A6D-AFE7-34BE10D7CFEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spike.Masstransit", "Spike.Masstransit\Spike.Masstransit.csproj", "{24FE7925-DF39-4A6D-AFE7-34BE10D7CFEF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spike.Masstransit.Topic", "Spike.Masstransit.Topic\Spike.Masstransit.Topic.csproj", "{38251B4B-8D0A-4E88-B723-587E1EAE7F60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masstransit.Publisher", "Masstransit.Publisher\Masstransit.Publisher.csproj", "{E8B2AA47-FBA2-40EF-ABDE-914F9A8D7F41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masstransit.Publisher", "Masstransit.Publisher\Masstransit.Publisher.csproj", "{E8B2AA47-FBA2-40EF-ABDE-914F9A8D7F41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyNetQManagement", "EasyNetQManagement\EasyNetQManagement.csproj", "{4E57731F-9945-413B-9430-4BE4E0771EF3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spike.Masstransit.Consumer", "Spike.Masstransit.Consumer\Spike.Masstransit.Consumer.csproj", "{67033A13-D93B-41A6-A910-78A66F47D526}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyNetQManagement", "EasyNetQManagement\EasyNetQManagement.csproj", "{4E57731F-9945-413B-9430-4BE4E0771EF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +51,6 @@ Global
 		{4E57731F-9945-413B-9430-4BE4E0771EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E57731F-9945-413B-9430-4BE4E0771EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E57731F-9945-413B-9430-4BE4E0771EF3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67033A13-D93B-41A6-A910-78A66F47D526}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67033A13-D93B-41A6-A910-78A66F47D526}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67033A13-D93B-41A6-A910-78A66F47D526}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67033A13-D93B-41A6-A910-78A66F47D526}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

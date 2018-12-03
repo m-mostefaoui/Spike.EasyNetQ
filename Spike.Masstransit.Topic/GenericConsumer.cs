@@ -9,13 +9,14 @@
 
     public class GenericConsumer : IConsumer<IEvent>
     {
-        private IComponentContext componentContext;
+        //private IComponentContext componentContext;
 
-        public GenericConsumer(IComponentContext componentContext)
-        {
-            this.componentContext = componentContext ?? throw new ArgumentNullException(nameof(componentContext));
-        }
+        //public GenericConsumer(IComponentContext componentContext)
+        //{
+        //    this.componentContext = componentContext ?? throw new ArgumentNullException(nameof(componentContext));
+        //}
 
+            
         public Task Consume(ConsumeContext<IEvent> context)
         {
             if (context.TryGetMessage(out ConsumeContext<JToken> jsonContext))

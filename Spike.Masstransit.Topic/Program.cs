@@ -14,10 +14,11 @@
         private const string Password = "pvRetailDev";
 
         private static IRabbitMqHost host;
-        private const string ExchangeName = "spike.exchange";
 
         static void Main(string[] args)
         {
+            string exchangeName = "spike-exchange-test";
+
             var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
             {
                 host = cfg.Host(new Uri(Url), h =>
@@ -26,54 +27,69 @@
                     h.Password(Password);
                 });
 
-                cfg.Send<IEvent>(x =>
+                cfg.Send<AddUser>(x => { x.UseRoutingKeyFormatter(context => "spike.users.*"); });
+                cfg.Message<AddUser>(x => x.SetEntityName(exchangeName));
+
+                cfg.Send<DeleteUser>(x => { x.UseRoutingKeyFormatter(context => "spike.users.delete"); });
+                cfg.Message<DeleteUser>(x => x.SetEntityName(exchangeName));
+                
+                cfg.Publish<AddUser>(x => x.ExchangeType = ExchangeType.Topic);
+                cfg.Publish<DeleteUser>(x => x.ExchangeType = ExchangeType.Topic);
+
+
+                cfg.ReceiveEndpoint(host, "spike.queue", x =>
                 {
-                    x.UseRoutingKeyFormatter(context => "spike.routingKey");
+                    x.BindMessageExchanges = false;
+
+                    x.Consumer<GenericConsumer>();
+
+                    x.Bind(exchangeName, s =>
+                    {
+                        s.RoutingKey = "spike.users.*";
+                        s.ExchangeType = ExchangeType.Topic;
+                    });
                 });
 
-                cfg.Message<IEvent>(x => x.SetEntityName("spike.exchange"));
-                cfg.Publish<IEvent>(x => x.ExchangeType = ExchangeType.Direct);
+
             });
 
             busControl.Start();
 
+      /*
             var builder = new ContainerBuilder();
             builder.RegisterType<GenericConsumer>();
             var container = builder.Build();
 
             var ctx = container.Resolve<IComponentContext>();
 
-            Subscribe(ctx, "generic");
+            Subscribe(ctx, "spike.exchange", "spike.queue1", "spike.*");
+            Subscribe(ctx, "spike.exchange", "spike.queue2", "spike.delete.*");
+    */        
 
             string input;
             do
             {
                 Console.WriteLine("ready");
-                busControl.Publish(new AddUser("Joe doe"));
-                busControl.Publish(new AddUser("Jane doe"));
-                busControl.Publish(new DeleteUser("Joe Doe"));
+                busControl.Publish(new AddUser("Add: Joe doe"));
+                busControl.Publish(new DeleteUser("Delete : Joe Doe"));
                 input = Console.ReadLine();
             } while (input != "q");
 
             busControl.Stop();
         }
 
-        private static void Subscribe(IComponentContext context, string key)
+        private static void Subscribe(IComponentContext context, string exchangeName, string queueName, string routingKey)
         {
-            var queueName = $"spike-{key}-queue";
-            //var handle = host.ConnectReceiveEndpoint(queueName, e =>
-            var handle = host.ConnectReceiveEndpoint("spike.queue", e =>
+            var handle = host.ConnectReceiveEndpoint(queueName, e =>
             {
                 e.BindMessageExchanges = false;
                 e.Consumer<GenericConsumer>(context);
-                //e.Bind(ExchangeName, x =>
-                e.Bind("spike.exchange", x =>
+                e.Bind(exchangeName, x =>
                 {
-                    x.ExchangeType = ExchangeType.Direct;
+                    x.ExchangeType = ExchangeType.Topic;
                     x.Durable = true;
-                    x.RoutingKey = "spike.routingKey";
+                    x.RoutingKey = routingKey;
                 });
-               // e.Bind<IEvent>();
             });
 
             handle.Ready.ConfigureAwait(false).GetAwaiter().GetResult();
